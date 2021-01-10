@@ -1,2 +1,43 @@
-
+insert ignore into
+t_service_entrytargetinfo
+(
+kbn,
+mid,
+sid,
+settlementwayid,
+settlementcompanyid,
+processkbn,
+outputflg,
+entry_timestamp,
+update_timestamp
+)
+select
+IF(SUBSTR(tmi.entry_timestamp,1,8) = SUBSTR(tms.entry_timestamp,1,8),'11','12') as kbn,
+tmi.mid,
+tmi.sid,
+tmi.settlementwayid,
+tmi.settlementcompanyid,
+IF(SUBSTR(tmi.entry_timestamp,1,8) = SUBSTR(tms.entry_timestamp,1,8),'2300101','2400101') as processkbn,
+'0' as outputflg,
+/*entry_timestamp*/,
+/*update_timestamp*/
+from t_merchant_basicinfo tmb
+inner join
+t_merchant_inspectionstatusinfo tmi
+on
+tmb.mid = tmi.mid
+and tmb.sid = tmi.sid
+inner join
+t_merchant_statusinfo tms
+on tmb.mid = tms.mid
+and tmb.sid = tms.sid
+where
+tmb.applyworkkbn = '01'
+and tmb.newestflg = '1'
+and tmb.deleteflg = '0'
+and tmi.entry_timestamp >= CONCAT(DATE_FORMAT(date_add(date(now()), interval -2 day),'%Y%m%d') ,'190500')
+and tmi.entry_timestamp <= CONCAT(DATE_FORMAT(date_add(date(now()), interval -1 day),'%Y%m%d') ,'190500')
+and tmi.newestflg = '1'
+and tmi.deleteflg = '0'
+and tms.deleteflg = '0'
 
